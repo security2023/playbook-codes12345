@@ -1,0 +1,75 @@
+---
+- hosts: all
+  become: yes
+  gather_facts: false
+  vars:
+    user_name: marcelle2025
+    collor: red
+  tasks: 
+   # - name: install softwares
+   #  package:
+   #    state: present
+   #    name:
+   #      -wget
+   #      -ntp
+   #      -finger
+   #      -curl
+   # - name: install softwares
+   #   package:
+   #     state: present
+   #     name: "{{item}}"
+   #  with_items:
+   #       -wget
+   #       -ntp
+   #       -finger
+   #       -curl
+    - name: check uptime
+      command: uptime
+      tags:
+        - cm
+    - name: install softwares
+      package:
+         state: present
+         name: "{{item}}"
+      loop:
+        - wget
+        - finger
+        - curl
+        - ntp
+
+
+    - name: Install passwd package
+      apt: 
+         name: passwd
+         state: present
+      when: ansible_distribution in "Debian,Ubuntu"
+      tags:
+        - app1
+    - name: creat group
+      group:
+         name: cloudteam
+         state: present
+#      when: ansible_distribution_major_version < 9
+    - name: creat user
+      user: 
+         name: "{{user_name}}"
+         comment: marcelle Admin
+         group: cloudteam
+
+- hosts: db
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: Install apache
+      apt:
+        name: apache2
+        state: present
+    - name: start apache service
+      service: name=apache2 state=started enabled=yes
+      tags:
+        - service
+    - name: copy index file
+      copy:
+        src: index.html
+        dest: /var/www/html/index.html
+        mode: '0644'

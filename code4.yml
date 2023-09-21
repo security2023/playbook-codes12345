@@ -1,0 +1,38 @@
+---
+- hosts: ws
+  become: yes
+  gather_facts: false
+  ignore_errors: true
+  tasks:
+ #    - name: Download artifacts from nexus
+ #      get_url:
+ #        url: http://198.58.119.40:8081/repository/Marcelle/bioMedical-0.0.2-SNAPSHOT.jar
+ #        dest: /tmp/app.jar
+ #        url_username: admin
+ #        url_password: devops
+
+       - name: Download artifacts from nexus
+         uri:
+           url: http://198.58.119.40:8081/repository/Marcelle/bioMedical-0.0.2-SNAPSHOT.jar
+           dest: /tmp/uri.jar
+           method: GET
+           url_username: admin
+           url_password: devops   
+
+       - name: install lxml
+         package:
+           name: python3-lxml
+           state: present
+
+       - name: download artifact
+         maven_artifact:
+           group_id: qa
+           version: 0.0.2-SNAPSHOT.jar
+           artifact_id: bioMedical
+           repository_url: 'http://198.58.119.40:8081/repository/Marcelle/'
+           username: admin
+           password: devops
+           dest: /tmp/maven.jar
+
+   
+   

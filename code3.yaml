@@ -1,0 +1,17 @@
+---
+- hosts: all
+  become: yes
+  gather_facts: false
+  ignore_errors: true
+  tasks:
+     - name: check uptime
+       command: uptime
+       register: uptime_output
+     - name: creat user
+       user:
+         name: marcelle
+         comment: marcelle admin
+       when: uptime_output.changed == "false"
+     - name: Display output
+       debug:
+         var: uptime_output.changed
